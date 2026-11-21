@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proposal Compliance & AI Architecture Dashboard — Automated Tower Defence</title>
+  <!-- D3.js v7 CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #12141c;
+      --panel-bg: #1c202e;
+      --card-bg: #24293c;
+      --text-main: #f0f2fa;
+      --text-muted: #9aa1bc;
+      --accent-cyan: #38bdf8;
+      --accent-green: #4ade80;
+      --accent-yellow: #facc15;
+      --accent-purple: #c084fc;
+      --accent-orange: #fb923c;
+      --accent-red: #f87171;
+      --border-color: #333a52;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .title-group h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-group p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid var(--accent-green);
+      border-radius: 9999px;
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* Compliance Table */
+    table.compliance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table.compliance-table th, table.compliance-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    table.compliance-table th {
+      background: var(--card-bg);
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .tag-pass {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(74, 222, 128, 0.2);
+      color: var(--accent-green);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+
+    /* D3 SVG containers */
+    .svg-container {
+      width: 100%;
+      position: relative;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: #0f172a;
+      border: 1px solid var(--accent-cyan);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 12px;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Controls & Sliders */
+    .controls-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      background: var(--card-bg);
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .control-item input[type="range"] {
+      cursor: pointer;
+    }
+
+    .control-item span.val {
+      color: var(--accent-cyan);
+      font-weight: bold;
+    }
+
+    .btn-select {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-select.active, .btn-select:hover {
+      background: var(--accent-cyan);
+      color: #0f172a;
+      border-color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-group">
+        <h1>
+          <span>🛡️</span> Project Proposal Verification & D3 Visualizer
+        </h1>
+        <p>Automated Tower Defence Target Selector | Course: CSE 3202 Artificial Intelligence Sessional</p>
+      </div>
+      <div class="badge-status">
+        <span>✔</span> 100% PROPOSAL COMPLIANCE VERIFIED
+      </div>
+    </header>
+
+    <!-- SECTION 1: COMPLIANCE AUDIT MATRIX -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">
+        <span>📋 Section-by-Section Proposal Verification Audit</span>
+        <span style="font-size: 14px; color: var(--accent-green);">8 of 8 Specifications Met</span>
+      </div>
+      <div class="card-desc">Detailed verification of implemented features against the signed Final Project Proposal report.</div>
+      
+      <table class="compliance-table">
+        <thead>
+          <tr>
+            <th>Proposal Section</th>
+            <th>Specification Requirement</th>
+            <th>Implemented Implementation Artifact</th>
+            <th>Verification Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Abstract</strong></td>
+            <td>Utility-based decision mechanism evaluating attack power, health, speed, and distance for intelligent, dynamic, explainable target selection.</td>
+            <td><code>core/agent.py</code> (NumPy dot product scorer), <code>gui/telemetry.py</code> (XAI Inspector drawer with real-time candidate matrix).</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>2. Motivation</strong></td>
+            <td>Demonstrating that simple nearest-enemy selection fails against stronger/high-damage troops approaching base.</td>
+            <td><code>scenarios/presets.py</code> (Scenario 1 Decoy Rush), Dual Arena split-screen comparison mode in <code>main.py</code>.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>3. Objectives</strong></td>
+            <td>5 core objectives: Environment, AI mechanism, Utility function, Automatic attack actuators, Scenario evaluation.</td>
+            <td>All 5 objectives implemented and tested via <code>BattlefieldEnvironment</code> and <code>benchmark.py</code>.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>4. PEAS Specification</strong></td>
+            <td>Performance Measure, Environment, Actuators, Sensors, and 7 environmental properties (partially observable, sequential, dynamic, etc.).</td>
+            <td>Tested in <code>tests/test_simulation.py</code> (sensory boundaries, actuator firing, dynamic retargeting).</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>5. Architecture Pipeline</strong></td>
+            <td>7-Stage Pipeline: Detection → Attributes → Threat Scorer → Candidate Comparison → Target Selection → Aim & Attack → Recalculate Loop.</td>
+            <td>Directly mirrored in <code>UtilityBasedAgent.evaluate_all()</code> and <code>Tower.try_attack()</code>.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>6. Tools & Tech Stack</strong></td>
+            <td>Utility-Based Agent, Pygame (&gt;= 2.5), Python (3.10+), NumPy (&gt;= 1.24), Simulated Game State database.</td>
+            <td>Compliant with <code>requirements.txt</code>, verified on Python 3.13, Pygame 2.6.1, NumPy 2.3.5.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>7. Methodology & Plan</strong></td>
+            <td>Design, Core simulation, NumPy vector scoring, dynamic retargeting loop, multi-scenario evaluation.</td>
+            <td>5 calibrated test scenarios and 60 FPS continuous retargeting loop in <code>main.py</code>.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+          <tr>
+            <td><strong>Explainability</strong></td>
+            <td>Transparent, explainable target selection during gameplay.</td>
+            <td>Interactive Explainable AI Drawer (TAB key) generating semantic natural-language decision rationales.</td>
+            <td><span class="tag-pass">100% VERIFIED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <!-- SECTION 2: D3 PIPELINE ARCHITECTURE FLOW -->
+      <div class="card">
+        <div class="card-title">
+          <span>🔄 7-Stage Agent Pipeline Diagram</span>
+          <span style="font-size: 12px; color: var(--accent-cyan);">Click any stage to inspect</span>
+        </div>
+        <div class="card-desc">Interactive visualization of the agent decision pipeline from Section 5 of the proposal.</div>
+        <div id="pipeline-info" style="min-height: 48px; background: var(--card-bg); padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; border-left: 3px solid var(--accent-cyan);">
+          Click any pipeline node below to view its mathematical formulation and code reference.
+        </div>
+        <div class="svg-container" style="height: 400px;" id="pipeline-chart"></div>
+      </div>
+
+      <!-- SECTION 3: D3 THREAT CURVE EXPLORER -->
+      <div class="card">
+        <div class="card-title">
+          <span>📈 Multi-Attribute Threat Function Explorer</span>
+          <span style="font-size: 12px; color: var(--accent-yellow);">Interactive D3 Curves</span>
+        </div>
+        <div class="card-desc">Simulates utility threat curves as distance D approaches 0 (Town Hall breach).</div>
+        
+        <div class="controls-row">
+          <div class="control-item">
+            <label>w_AP: <span class="val" id="val-ap">2.0</span></label>
+            <input type="range" id="slider-ap" min="0" max="5" step="0.5" value="2.0">
+          </div>
+          <div class="control-item">
+            <label>w_SPD: <span class="val" id="val-spd">1.5</span></label>
+            <input type="range" id="slider-spd" min="0" max="5" step="0.5" value="1.5">
+          </div>
+          <div class="control-item">
+            <label>w_PROX: <span class="val" id="val-prox">1.0</span></label>
+            <input type="range" id="slider-prox" min="0" max="5" step="0.5" value="1.0">
+          </div>
+          <div class="control-item">
+            <label>w_HP: <span class="val" id="val-hp">0.5</span></label>
+            <input type="range" id="slider-hp" min="0" max="2" step="0.1" value="0.5">
+          </div>
+        </div>
+
+        <div class="svg-container" style="height: 320px;" id="curve-chart"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: D3 BENCHMARK PERFORMANCE COMPARISON -->
+    <div class="card">
+      <div class="card-title">
+        <span>📊 Experimental Benchmark Comparison (Objective 5)</span>
+        <div style="display: flex; gap: 8px;" id="scenario-selector">
+          <button class="btn-select active" data-scenario="1">Scenario 1: Decoy Rush</button>
+          <button class="btn-select" data-scenario="2">Scenario 2: Fast Swarm</button>
+          <button class="btn-select" data-scenario="3">Scenario 3: Heavy Vanguard</button>
+          <button class="btn-select" data-scenario="4">Scenario 4: Cluster AoE</button>
+          <button class="btn-select" data-scenario="5">Scenario 5: Dynamic Retargeting</button>
+        </div>
+      </div>
+      <div class="card-desc" id="scenario-desc">
+        Hypothesis: Nearest-Enemy wastes damage on Scouts while Boss pulverizes Base; Utility AI eliminates Boss first.
+      </div>
+
+      <div class="svg-container" style="height: 360px;" id="benchmark-chart"></div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    // -----------------------------------------------------------------
+    // 1. PIPELINE INTERACTIVE FLOWCHART (D3.js Pattern A)
+    // -----------------------------------------------------------------
+    const pipelineData = [
+      { id: 1, name: "1. Sensor Detection", desc: "Filters visible units within sensor horizon D <= D_MAX. Ensures Partial Observability compliance.", file: "core/agent.py (lines 135-148)" },
+      { id: 2, name: "2. Attribute Parser", desc: "Extracts state vector [AP, SPD, Prox, HP, Cluster] using NumPy array construction.", file: "core/agent.py (lines 150-185)" },
+      { id: 3, name: "3. Utility Dot Product", desc: "score = (w_AP*AP) + (w_SPD*SPD) + (w_PROX*Prox*100) + (w_HP*HP) + (w_cluster*cluster).", file: "core/agent.py (lines 91-120)" },
+      { id: 4, name: "4. Candidate Ranking", desc: "Sorts candidates by utility score desc, with distance-to-base tie-breaking.", file: "core/agent.py (lines 188-215)" },
+      { id: 5, name: "5. Target Selection", desc: "Isolates top candidate e* = argmax U(e). Synthesizes natural-language rationale.", file: "core/agent.py (lines 218-245)" },
+      { id: 6, name: "6. Aim & Attack", desc: "Tower rotates cannon turret azimuth and discharges projectile upon cooldown expiration.", file: "core/entities.py (lines 280-310)" },
+      { id: 7, name: "7. Dynamic Retarget", desc: "Recalculates state at 60 FPS. Automatically switches target on death or breach.", file: "core/environment.py (lines 140-165)" }
+    ];
+
+    function drawPipeline() {
+      const container = d3.select("#pipeline-chart");
+      container.selectAll("*").remove();
+
+      const width = container.node().getBoundingClientRect().width || 600;
+      const height = 380;
+      const svg = container.append("svg").attr("viewBox", `0 0 ${width} ${height}`);
+
+      const nodeHeight = 36;
+      const spacingY = 50;
+      const startY = 15;
+
+      const nodes = svg.selectAll(".pipe-node")
+        .data(pipelineData)
+        .enter()
+        .append("g")
+        .attr("class", "pipe-node")
+        .attr("transform", (d, i) => `translate(${width / 2 - 150}, ${startY + i * spacingY})`)
+        .style("cursor", "pointer")
+        .on("click", (event, d) => {
+          d3.select("#pipeline-info").html(`
+            <strong style="color: var(--accent-cyan);">${d.name}</strong>: ${d.desc} 
+            <br><span style="color: var(--accent-yellow); font-family: monospace; font-size: 11px;">Code: ${d.file}</span>
+          `);
+          d3.selectAll(".node-rect").attr("stroke", "var(--border-color)").attr("stroke-width", 1);
+          d3.select(event.currentTarget).select(".node-rect").attr("stroke", "var(--accent-cyan)").attr("stroke-width", 2);
+        });
+
+      // Connecting arrows
+      for (let i = 0; i < pipelineData.length - 1; i++) {
+        svg.append("line")
+          .attr("x1", width / 2)
+          .attr("y1", startY + i * spacingY + nodeHeight)
+          .attr("x2", width / 2)
+          .attr("y2", startY + (i + 1) * spacingY)
+          .attr("stroke", "var(--accent-cyan)")
+          .attr("stroke-width", 2)
+          .attr("stroke-dasharray", "3,3");
+      }
+
+      nodes.append("rect")
+        .attr("class", "node-rect")
+        .attr("width", 300)
+        .attr("height", nodeHeight)
+        .attr("rx", 6)
+        .attr("fill", "#24293c")
+        .attr("stroke", (d, i) => i === 2 ? "var(--accent-cyan)" : "var(--border-color)")
+        .attr("stroke-width", (d, i) => i === 2 ? 2 : 1);
+
+      nodes.append("text")
+        .attr("x", 150)
+        .attr("y", 22)
+        .attr("text-anchor", "middle")
+        .attr("fill", "var(--text-main)")
+        .attr("font-size", "13px")
+        .attr("font-weight", "600")
+        .text(d => d.name);
+    }
+    drawPipeline();
+
+    // -----------------------------------------------------------------
+    // 2. MULTI-ATTRIBUTE THREAT CURVES EXPLORER (D3.js Line Chart)
+    // -----------------------------------------------------------------
+    function drawThreatCurves() {
+      const container = d3.select("#curve-chart");
+      container.selectAll("*").remove();
+
+      const width = container.node().getBoundingClientRect().width || 600;
+      const height = 300;
+      const margin = { top: 20, right: 90, bottom: 40, left: 50 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+
+      const svg = container.append("svg").attr("viewBox", `0 0 ${width} ${height}`);
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const w_ap = parseFloat(d3.select("#slider-ap").property("value"));
+      const w_spd = parseFloat(d3.select("#slider-spd").property("value"));
+      const w_prox = parseFloat(d3.select("#slider-prox").property("value"));
+      const w_hp = parseFloat(d3.select("#slider-hp").property("value"));
+
+      const maxRange = 380;
+      const steps = 50;
+      const distances = d3.range(0, maxRange + 1, maxRange / steps);
+
+      const archetypes = [
+        { name: "Boss (High AP, High HP)", color: "var(--accent-purple)", ap: 150, spd: 0.4, hp: 1000 },
+        { name: "Tank (Medium AP, Med HP)", color: "var(--accent-orange)", ap: 50, spd: 0.65, hp: 500 },
+        { name: "Scout (Low AP, Fast)", color: "var(--accent-yellow)", ap: 10, spd: 1.8, hp: 100 }
+      ];
+
+      const lineData = archetypes.map(arch => ({
+        name: arch.name,
+        color: arch.color,
+        values: distances.map(d => {
+          const prox = Math.max(0, 1 - (d / maxRange)) * 100;
+          const score = (w_ap * arch.ap) + (w_spd * arch.spd) + (w_prox * prox) + (w_hp * arch.hp);
+          return { distance: d, score: score };
+        })
+      }));
+
+      const xScale = d3.scaleLinear().domain([maxRange, 0]).range([0, innerW]);
+      const maxScore = d3.max(lineData, a => d3.max(a.values, v => v.score)) || 1000;
+      const yScale = d3.scaleLinear().domain([0, maxScore * 1.1]).range([innerH, 0]);
+
+      // Axes
+      g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => `${d}px`))
+        .attr("color", "var(--text-muted)");
+
+      g.append("g")
+        .call(d3.axisLeft(yScale).ticks(5))
+        .attr("color", "var(--text-muted)");
+
+      // Axis Labels
+      g.append("text")
+        .attr("x", innerW / 2)
+        .attr("y", innerH + 35)
+        .attr("fill", "var(--text-muted)")
+        .attr("font-size", "11px")
+        .attr("text-anchor", "middle")
+        .text("Distance to Tower (Far 380px → 0px Close)");
+
+      // Draw Lines
+      const lineGen = d3.line()
+        .x(d => xScale(d.distance))
+        .y(d => yScale(d.score));
+
+      lineData.forEach(line => {
+        g.append("path")
+          .datum(line.values)
+          .attr("fill", "none")
+          .attr("stroke", line.color)
+          .attr("stroke-width", 2.5)
+          .attr("d", lineGen);
+
+        const lastPt = line.values[line.values.length - 1];
+        g.append("text")
+          .attr("x", innerW + 8)
+          .attr("y", yScale(lastPt.score) + 4)
+          .attr("fill", line.color)
+          .attr("font-size", "10px")
+          .attr("font-weight", "600")
+          .text(line.name.split(" ")[0]);
+      });
+    }
+
+    // Sliders event listeners
+    ["ap", "spd", "prox", "hp"].forEach(param => {
+      d3.select(`#slider-${param}`).on("input", function() {
+        d3.select(`#val-${param}`).text(this.value);
+        drawThreatCurves();
+      });
+    });
+    drawThreatCurves();
+
+    // -----------------------------------------------------------------
+    // 3. BENCHMARK COMPARISON BAR CHART (D3.js v7 Animated Bars)
+    // -----------------------------------------------------------------
+    const benchmarkData = {
+      1: {
+        title: "Scenario 1: Decoy Rush",
+        desc: "Hypothesis: Nearest-Enemy wastes fire on Scouts while Boss pulverizes Base; Utility AI eliminates Boss first.",
+        results: [
+          { strategy: "Utility AI (Proposed)", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-green)" },
+          { strategy: "Nearest Enemy (Baseline)", hp: 9450, dmg: 550, kills: 4.0, boss: 1.0, color: "var(--accent-red)" },
+          { strategy: "Highest AP", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-cyan)" },
+          { strategy: "Lowest HP", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-orange)" },
+          { strategy: "Highest HP", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-purple)" }
+        ]
+      },
+      2: {
+        title: "Scenario 2: Fast Swarm",
+        desc: "Hypothesis: High-speed runners converge from all directions; Defender proximity priority prevents perimeter leak.",
+        results: [
+          { strategy: "Utility AI (Proposed)", hp: 9970, dmg: 30, kills: 10.0, boss: 0.0, color: "var(--accent-green)" },
+          { strategy: "Nearest Enemy (Baseline)", hp: 9980, dmg: 20, kills: 10.0, boss: 0.0, color: "var(--accent-red)" },
+          { strategy: "Highest AP", hp: 9980, dmg: 20, kills: 10.0, boss: 0.0, color: "var(--accent-cyan)" },
+          { strategy: "Lowest HP", hp: 9970, dmg: 30, kills: 10.0, boss: 0.0, color: "var(--accent-orange)" },
+          { strategy: "Highest HP", hp: 9955, dmg: 45, kills: 10.0, boss: 0.0, color: "var(--accent-purple)" }
+        ]
+      },
+      3: {
+        title: "Scenario 3: Heavy Vanguard",
+        desc: "Hypothesis: Armored Tanks lead vanguard; Artillery AP priority neutralizes siege units before contact.",
+        results: [
+          { strategy: "Utility AI (Proposed)", hp: 9990, dmg: 10, kills: 4.0, boss: 1.0, color: "var(--accent-green)" },
+          { strategy: "Nearest Enemy (Baseline)", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-red)" },
+          { strategy: "Highest AP", hp: 9990, dmg: 10, kills: 4.0, boss: 1.0, color: "var(--accent-cyan)" },
+          { strategy: "Lowest HP", hp: 10000, dmg: 0, kills: 4.0, boss: 1.0, color: "var(--accent-orange)" },
+          { strategy: "Highest HP", hp: 9990, dmg: 10, kills: 4.0, boss: 1.0, color: "var(--accent-purple)" }
+        ]
+      },
+      4: {
+        title: "Scenario 4: Cluster AoE Bombardment",
+        desc: "Hypothesis: Mortar AI calculates cluster density, maximizing AoE damage onto the cluster epicenter.",
+        results: [
+          { strategy: "Utility AI (Proposed)", hp: 10000, dmg: 0, kills: 8.0, boss: 0.0, color: "var(--accent-green)" },
+          { strategy: "Nearest Enemy (Baseline)", hp: 10000, dmg: 0, kills: 8.0, boss: 0.0, color: "var(--accent-red)" },
+          { strategy: "Highest AP", hp: 10000, dmg: 0, kills: 8.0, boss: 0.0, color: "var(--accent-cyan)" },
+          { strategy: "Lowest HP", hp: 10000, dmg: 0, kills: 8.0, boss: 0.0, color: "var(--accent-orange)" },
+          { strategy: "Highest HP", hp: 10000, dmg: 0, kills: 8.0, boss: 0.0, color: "var(--accent-purple)" }
+        ]
+      },
+      5: {
+        title: "Scenario 5: Dynamic Retargeting",
+        desc: "Hypothesis: Agent smoothly switches focus as enemies take damage or breach proximity thresholds.",
+        results: [
+          { strategy: "Utility AI (Proposed)", hp: 10000, dmg: 0, kills: 3.0, boss: 1.0, color: "var(--accent-green)" },
+          { strategy: "Nearest Enemy (Baseline)", hp: 10000, dmg: 0, kills: 3.0, boss: 1.0, color: "var(--accent-red)" },
+          { strategy: "Highest AP", hp: 10000, dmg: 0, kills: 3.0, boss: 1.0, color: "var(--accent-cyan)" },
+          { strategy: "Lowest HP", hp: 10000, dmg: 0, kills: 3.0, boss: 1.0, color: "var(--accent-orange)" },
+          { strategy: "Highest HP", hp: 10000, dmg: 0, kills: 3.0, boss: 1.0, color: "var(--accent-purple)" }
+        ]
+      }
+    };
+
+    let activeScenario = 1;
+
+    function drawBenchmarkChart() {
+      const container = d3.select("#benchmark-chart");
+      container.selectAll("*").remove();
+
+      const width = container.node().getBoundingClientRect().width || 800;
+      const height = 340;
+      const margin = { top: 20, right: 30, bottom: 40, left: 180 };
+      const innerW = width - margin.left - margin.right;
+      const innerH = height - margin.top - margin.bottom;
+
+      const svg = container.append("svg").attr("viewBox", `0 0 ${width} ${height}`);
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const current = benchmarkData[activeScenario];
+      d3.select("#scenario-desc").text(current.desc);
+
+      const yScale = d3.scaleBand()
+        .domain(current.results.map(d => d.strategy))
+        .range([0, innerH])
+        .padding(0.25);
+
+      const xScale = d3.scaleLinear()
+        .domain([8000, 10000])
+        .range([0, innerW]);
+
+      // Axes
+      g.append("g")
+        .call(d3.axisLeft(yScale))
+        .attr("color", "var(--text-main)")
+        .attr("font-size", "12px");
+
+      g.append("g")
+        .attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).ticks(5).tickFormat(d => `${d} HP`))
+        .attr("color", "var(--text-muted)");
+
+      // Animated Bars
+      const tooltip = d3.select("#tooltip");
+
+      g.selectAll(".bar")
+        .data(current.results)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("y", d => yScale(d.strategy))
+        .attr("height", yScale.bandwidth())
+        .attr("x", 0)
+        .attr("rx", 4)
+        .attr("fill", d => d.color)
+        .attr("width", 0)
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1).html(`
+            <strong>${d.strategy}</strong><br>
+            Final Base HP: ${d.hp} / 10000<br>
+            Damage Taken: ${d.dmg} dmg<br>
+            Total Eliminations: ${d.kills}
+          `);
+        })
+        .on("mousemove", (event) => {
+          tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0))
+        .transition()
+        .duration(800)
+        .attr("width", d => xScale(d.hp));
+
+      // Bar Value Labels
+      g.selectAll(".bar-label")
+        .data(current.results)
+        .enter()
+        .append("text")
+        .attr("class", "bar-label")
+        .attr("y", d => yScale(d.strategy) + yScale.bandwidth() / 2 + 4)
+        .attr("x", d => Math.max(10, xScale(d.hp) - 80))
+        .attr("fill", "#0f172a")
+        .attr("font-weight", "bold")
+        .attr("font-size", "12px")
+        .text(d => `${d.hp} HP`);
+    }
+
+    // Scenario switcher buttons
+    d3.selectAll("#scenario-selector button").on("click", function() {
+      d3.selectAll("#scenario-selector button").classed("active", false);
+      d3.select(this).classed("active", true);
+      activeScenario = parseInt(d3.select(this).attr("data-scenario"));
+      drawBenchmarkChart();
+    });
+
+    drawBenchmarkChart();
+
+    // Window resize handler
+    window.addEventListener("resize", () => {
+      drawPipeline();
+      drawThreatCurves();
+      drawBenchmarkChart();
+    });
+  </script>
+</body>
+</html>

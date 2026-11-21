@@ -1,0 +1,282 @@
+{
+  "1": {
+    "scenario_name": "The Decoy Rush",
+    "subtitle": "Nearest-Enemy Failure vs Utility-AI Success",
+    "strategies": {
+      "UTILITY_AI": {
+        "label": "Utility-Based AI (Proposed)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.65,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "NEAREST_ENEMY": {
+        "label": "Nearest Enemy (Baseline)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.2333333333333334,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_AP": {
+        "label": "Highest Attack Power",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.65,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "LOWEST_HP": {
+        "label": "Lowest HP (Weakest First)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.716666666666667,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_HP": {
+        "label": "Highest HP (Tank Hunter)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 3.1,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      }
+    }
+  },
+  "2": {
+    "scenario_name": "Fast Swarm Rush",
+    "subtitle": "Speed & Perimeter Proximity Defense",
+    "strategies": {
+      "UTILITY_AI": {
+        "label": "Utility-Based AI (Proposed)",
+        "survival_rate": 100.0,
+        "avg_hp": 9970.0,
+        "avg_hp_pct": 99.7,
+        "avg_damage": 30.0,
+        "avg_time": 2.7000000000000006,
+        "avg_kills": 10.0,
+        "avg_boss_kills": 0.0
+      },
+      "NEAREST_ENEMY": {
+        "label": "Nearest Enemy (Baseline)",
+        "survival_rate": 100.0,
+        "avg_hp": 9980.0,
+        "avg_hp_pct": 99.8,
+        "avg_damage": 20.0,
+        "avg_time": 2.716666666666667,
+        "avg_kills": 10.0,
+        "avg_boss_kills": 0.0
+      },
+      "HIGHEST_AP": {
+        "label": "Highest Attack Power",
+        "survival_rate": 100.0,
+        "avg_hp": 9980.0,
+        "avg_hp_pct": 99.8,
+        "avg_damage": 20.0,
+        "avg_time": 2.716666666666667,
+        "avg_kills": 10.0,
+        "avg_boss_kills": 0.0
+      },
+      "LOWEST_HP": {
+        "label": "Lowest HP (Weakest First)",
+        "survival_rate": 100.0,
+        "avg_hp": 9970.0,
+        "avg_hp_pct": 99.7,
+        "avg_damage": 30.0,
+        "avg_time": 3.266666666666667,
+        "avg_kills": 10.0,
+        "avg_boss_kills": 0.0
+      },
+      "HIGHEST_HP": {
+        "label": "Highest HP (Tank Hunter)",
+        "survival_rate": 100.0,
+        "avg_hp": 9955.0,
+        "avg_hp_pct": 99.55000000000001,
+        "avg_damage": 45.0,
+        "avg_time": 2.7999999999999994,
+        "avg_kills": 10.0,
+        "avg_boss_kills": 0.0
+      }
+    }
+  },
+  "3": {
+    "scenario_name": "Heavy Vanguard",
+    "subtitle": "Multi-Attribute AP & Armor Prioritization",
+    "strategies": {
+      "UTILITY_AI": {
+        "label": "Utility-Based AI (Proposed)",
+        "survival_rate": 100.0,
+        "avg_hp": 9990.0,
+        "avg_hp_pct": 99.90000000000002,
+        "avg_damage": 10.0,
+        "avg_time": 5.3,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "NEAREST_ENEMY": {
+        "label": "Nearest Enemy (Baseline)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 7.400000000000001,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_AP": {
+        "label": "Highest Attack Power",
+        "survival_rate": 100.0,
+        "avg_hp": 9990.0,
+        "avg_hp_pct": 99.90000000000002,
+        "avg_damage": 10.0,
+        "avg_time": 5.3,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "LOWEST_HP": {
+        "label": "Lowest HP (Weakest First)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 7.400000000000001,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_HP": {
+        "label": "Highest HP (Tank Hunter)",
+        "survival_rate": 100.0,
+        "avg_hp": 9990.0,
+        "avg_hp_pct": 99.90000000000002,
+        "avg_damage": 10.0,
+        "avg_time": 5.966666666666666,
+        "avg_kills": 4.0,
+        "avg_boss_kills": 1.0
+      }
+    }
+  },
+  "4": {
+    "scenario_name": "Cluster Incursion",
+    "subtitle": "Cluster Density & AoE Splash Bombardment",
+    "strategies": {
+      "UTILITY_AI": {
+        "label": "Utility-Based AI (Proposed)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8500000000000003,
+        "avg_kills": 8.0,
+        "avg_boss_kills": 0.0
+      },
+      "NEAREST_ENEMY": {
+        "label": "Nearest Enemy (Baseline)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.1666666666666665,
+        "avg_kills": 8.0,
+        "avg_boss_kills": 0.0
+      },
+      "HIGHEST_AP": {
+        "label": "Highest Attack Power",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8500000000000003,
+        "avg_kills": 8.0,
+        "avg_boss_kills": 0.0
+      },
+      "LOWEST_HP": {
+        "label": "Lowest HP (Weakest First)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.1666666666666665,
+        "avg_kills": 8.0,
+        "avg_boss_kills": 0.0
+      },
+      "HIGHEST_HP": {
+        "label": "Highest HP (Tank Hunter)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8500000000000003,
+        "avg_kills": 8.0,
+        "avg_boss_kills": 0.0
+      }
+    }
+  },
+  "5": {
+    "scenario_name": "Dynamic Retargeting",
+    "subtitle": "Real-Time Adaptation to Health & Distance Changes",
+    "strategies": {
+      "UTILITY_AI": {
+        "label": "Utility-Based AI (Proposed)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8833333333333335,
+        "avg_kills": 3.0,
+        "avg_boss_kills": 1.0
+      },
+      "NEAREST_ENEMY": {
+        "label": "Nearest Enemy (Baseline)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.6166666666666667,
+        "avg_kills": 3.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_AP": {
+        "label": "Highest Attack Power",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8833333333333335,
+        "avg_kills": 3.0,
+        "avg_boss_kills": 1.0
+      },
+      "LOWEST_HP": {
+        "label": "Lowest HP (Weakest First)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 2.6166666666666667,
+        "avg_kills": 3.0,
+        "avg_boss_kills": 1.0
+      },
+      "HIGHEST_HP": {
+        "label": "Highest HP (Tank Hunter)",
+        "survival_rate": 100.0,
+        "avg_hp": 10000.0,
+        "avg_hp_pct": 100.0,
+        "avg_damage": 0.0,
+        "avg_time": 1.8833333333333335,
+        "avg_kills": 3.0,
+        "avg_boss_kills": 1.0
+      }
+    }
+  }
+}
